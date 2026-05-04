@@ -37,7 +37,7 @@ Find us at:
 [![Jenkins Build](https://img.shields.io/jenkins/build?labelColor=555555&logoColor=ffffff&style=for-the-badge&jobUrl=https%3A%2F%2Fci.linuxserver.io%2Fjob%2FDocker-Pipeline-Builders%2Fjob%2Fdocker-qbittorrent%2Fjob%2Fmaster%2F&logo=jenkins)](https://ci.linuxserver.io/job/Docker-Pipeline-Builders/job/docker-qbittorrent/job/master/)
 [![LSIO CI](https://img.shields.io/badge/dynamic/yaml?color=94398d&labelColor=555555&logoColor=ffffff&style=for-the-badge&label=CI&query=CI&url=https%3A%2F%2Fci-tests.linuxserver.io%2Flinuxserver%2Fqbittorrent%2Flatest%2Fci-status.yml)](https://ci-tests.linuxserver.io/linuxserver/qbittorrent/latest/index.html)
 
-The [Qbittorrent](https://www.qbittorrent.org/) project aims to provide an open-source software alternative to µTorrent. qBittorrent is based on the Qt toolkit and libtorrent-rasterbar library.
+The [Qbittorrent](https://www.qbittorrent.org/) is a bittorrent client programmed in C++ / Qt that uses libtorrent (sometimes called libtorrent-rasterbar) by Arvid Norberg.
 
 [![qbittorrent](https://github.com/linuxserver/docker-templates/raw/master/linuxserver.io/img/qbittorrent-icon.png)](https://www.qbittorrent.org/)
 
@@ -60,8 +60,8 @@ This image provides various versions that are available via tags. Please read th
 
 | Tag | Available | Description |
 | :----: | :----: |--- |
-| latest | ✅ | Stable qbittorrent releases |
-| libtorrentv1 | ✅ | Static qbittorrent builds using libtorrent v1 |
+| latest | ✅ | Stable qbittorrent releases using libtorrent v2 |
+| libtorrentv1 | ✅ | Stable qbittorrent releases using libtorrent v1 |
 
 ## Application Setup
 
@@ -322,6 +322,7 @@ Once registered you can define the dockerfile to use with `-f Dockerfile.aarch64
 
 ## Versions
 
+* **04.05.26:** - Switch to static builds for parity with libtorrentv1 branch. Rebase to Alpine 3.23.
 * **17.07.24:** - Restore qbittorrent-cli as it now supports openssl 3.
 * **25.05.24:** - Remove qbittorrent-cli as it still requires openssl 1.1 which is EOL.
 * **14.02.24:** - Only set/override torrenting port if the optional env var is set.
