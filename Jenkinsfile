@@ -27,9 +27,6 @@ pipeline {
     DEV_DOCKERHUB_IMAGE = 'lsiodev/qbittorrent'
     PR_DOCKERHUB_IMAGE = 'lspipepr/qbittorrent'
     DIST_IMAGE = 'alpine'
-    DIST_TAG = 'edge'
-    DIST_REPO = 'http://dl-cdn.alpinelinux.org/alpine/edge/community/'
-    DIST_REPO_PACKAGES = 'qbittorrent-nox'
     MULTIARCH='true'
     CI='true'
     CI_WEB='true'
@@ -146,15 +143,14 @@ pipeline {
     /* ########################
        External Release Tagging
        ######################## */
-    // If this is an alpine repo change for external version determine an md5 from the version string
-    stage("Set tag Alpine Repo"){
+    // If this is a custom command to determine version use that command
+    stage("Set tag custom bash"){
       steps{
         script{
           env.EXT_RELEASE = sh(
-            script: '''curl -sL "${DIST_REPO}x86_64/APKINDEX.tar.gz" | tar -xz -C /tmp \
-                       && awk '/^P:'"${DIST_REPO_PACKAGES}"'$/,/V:/' /tmp/APKINDEX | sed -n 2p | sed 's/^V://' ''',
+            script: ''' curl -sL 'https://api.github.com/repos/userdocs/qbittorrent-nox-static/releases' | jq -r 'first(.[] | select(.prerelease == false) | .tag_name)' | awk -F '-' '{print $2}' ''',
             returnStdout: true).trim()
-            env.RELEASE_LINK = 'alpine_repo'
+            env.RELEASE_LINK = 'custom_command'
         }
       }
     }
@@ -597,7 +593,7 @@ pipeline {
           --label \"org.opencontainers.image.licenses=GPL-3.0-only\" \
           --label \"org.opencontainers.image.ref.name=${COMMIT_SHA}\" \
           --label \"org.opencontainers.image.title=Qbittorrent\" \
-          --label \"org.opencontainers.image.description=The [Qbittorrent](https://www.qbittorrent.org/) project aims to provide an open-source software alternative to µTorrent. qBittorrent is based on the Qt toolkit and libtorrent-rasterbar library.\" \
+          --label \"org.opencontainers.image.description=The [Qbittorrent](https://www.qbittorrent.org/) is a bittorrent client programmed in C++ / Qt that uses libtorrent (sometimes called libtorrent-rasterbar) by Arvid Norberg.\" \
           --no-cache --pull -t ${IMAGE}:${META_TAG} --platform=linux/amd64 \
           --provenance=true --sbom=true --builder=container --load \
           --build-arg ${BUILD_VERSION_ARG}=${EXT_RELEASE} --build-arg VERSION=\"${VERSION_TAG}\" --build-arg BUILD_DATE=${GITHUB_DATE} ."
@@ -666,7 +662,7 @@ pipeline {
               --label \"org.opencontainers.image.licenses=GPL-3.0-only\" \
               --label \"org.opencontainers.image.ref.name=${COMMIT_SHA}\" \
               --label \"org.opencontainers.image.title=Qbittorrent\" \
-              --label \"org.opencontainers.image.description=The [Qbittorrent](https://www.qbittorrent.org/) project aims to provide an open-source software alternative to µTorrent. qBittorrent is based on the Qt toolkit and libtorrent-rasterbar library.\" \
+              --label \"org.opencontainers.image.description=The [Qbittorrent](https://www.qbittorrent.org/) is a bittorrent client programmed in C++ / Qt that uses libtorrent (sometimes called libtorrent-rasterbar) by Arvid Norberg.\" \
               --no-cache --pull -t ${IMAGE}:amd64-${META_TAG} --platform=linux/amd64 \
               --provenance=true --sbom=true --builder=container --load \
               --build-arg ${BUILD_VERSION_ARG}=${EXT_RELEASE} --build-arg VERSION=\"${VERSION_TAG}\" --build-arg BUILD_DATE=${GITHUB_DATE} ."
@@ -728,7 +724,7 @@ pipeline {
               --label \"org.opencontainers.image.licenses=GPL-3.0-only\" \
               --label \"org.opencontainers.image.ref.name=${COMMIT_SHA}\" \
               --label \"org.opencontainers.image.title=Qbittorrent\" \
-              --label \"org.opencontainers.image.description=The [Qbittorrent](https://www.qbittorrent.org/) project aims to provide an open-source software alternative to µTorrent. qBittorrent is based on the Qt toolkit and libtorrent-rasterbar library.\" \
+              --label \"org.opencontainers.image.description=The [Qbittorrent](https://www.qbittorrent.org/) is a bittorrent client programmed in C++ / Qt that uses libtorrent (sometimes called libtorrent-rasterbar) by Arvid Norberg.\" \
               --no-cache --pull -f Dockerfile.aarch64 -t ${IMAGE}:arm64v8-${META_TAG} --platform=linux/arm64 \
               --provenance=true --sbom=true --builder=container --load \
               --build-arg ${BUILD_VERSION_ARG}=${EXT_RELEASE} --build-arg VERSION=\"${VERSION_TAG}\" --build-arg BUILD_DATE=${GITHUB_DATE} ."
@@ -1026,7 +1022,7 @@ pipeline {
                   "type": "commit",\
                   "tagger": {"name": "LinuxServer-CI","email": "ci@linuxserver.io","date": "'${GITHUB_DATE}'"}}'
               echo "Pushing New release for Tag"
-              echo "Updating external repo packages to ${EXT_RELEASE_CLEAN}" > releasebody.json
+              echo "Updating to ${EXT_RELEASE_CLEAN}" > releasebody.json
               jq -n \
                 --arg tag_name "$META_TAG" \
                 --arg target_commitish "master" \
